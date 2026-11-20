@@ -133,9 +133,9 @@ def polygon(color, points):
 
 def arena_art(kind):
     sky, far, mid, floor, lit, card = {
-        "meadow": ("aacbc2", "83ae9d", "628d79", "95b983", "b9cc90", "e0e9ba"),
-        "cave": ("8798b2", "657690", "4d6481", "798a9f", "a0abbe", "d9deeb"),
-        "summit": ("c5afd0", "a08db8", "776e9c", "8c8cb2", "bfb6d0", "e7dbef"),
+        "meadow": ("b9d5c4", "83ae9d", "628d79", "91b883", "c2d49a", "fff5d9"),
+        "cave": ("a1adc0", "657690", "4d6481", "798a9f", "b6c0c7", "fff5d9"),
+        "summit": ("d8c4d3", "a08db8", "776e9c", "8c8cb2", "d6c7d4", "fff5d9"),
     }[kind]
     art = [rect(sky, 0, 0, 399, 134)]
     if kind == "cave":
@@ -151,16 +151,44 @@ def arena_art(kind):
                 polygon(mid, [(0,40),(0,69),(53,78),(110,65),(188,82),
                               (265,68),(302,85),(399,65),(399,40)])]
     art.append(polygon(floor, [(0,0),(0,53),(136,80),(399,87),(399,0)]))
+    art += [polygon(lit, [(0,0),(0,29),(188,64),(399,72),(399,0)]),
+            polygon(far, [(0,0),(0,4),(170,36),(399,49),(399,43),(173,30)])]
     for x, y, w in ((4,17,34),(120,16,48),(208,60,25),(169,31,32),(284,73,47),(343,9,32)):
         art.append(rect(lit, x, y, w, 2))
     for x, y, w in ((24,11,114),(262,63,116)):
-        art += [polygon(mid, [(x,y+3),(x+13,y),(x+w-13,y),(x+w,y+3),
-                              (x+w,y+12),(x+w-13,y+16),(x+13,y+16),(x,y+12)]),
-                polygon(lit, [(x+5,y+8),(x+16,y+5),(x+w-16,y+5),(x+w-5,y+8),
-                              (x+w-16,y+13),(x+16,y+13)])]
+        art += [polygon(mid, [(x-8,y+2),(x+10,y-2),(x+w-10,y-2),(x+w+8,y+2),
+                              (x+w+8,y+8),(x+w-10,y+13),(x+10,y+13),(x-8,y+8)]),
+                polygon(lit, [(x,y+9),(x+16,y+5),(x+w-16,y+5),(x+w,y+9),
+                              (x+w-16,y+14),(x+16,y+14)])]
     for x, y in ((0, 86), (198, 21)):
-        art += [rect(mid, x, y, 196, 42), rect(card, x, y+2, 196, 40)]
+        art += [rect("30494a", x+3, y-3, 193, 43),
+                rect(card, x, y, 193, 41),
+                rect("d6c8a7", x+4, y+4, 185, 2),
+                rect("df8d52" if x == 0 else "4e9a88", x, y+37, 193, 4),
+                rect("30494a", x+9, y+11, 20, 2)]
     return art
+
+
+def battle_panel_art():
+    # Vector art only; the PDF edition stamps its own title on the panel.
+    art = [rect("263c44", 0, 0, 399, 113),
+           rect("fff4da", 4, 5, 391, 104),
+           rect("d2dfcd", 9, 98, 381, 11),
+           rect("30494a", 9, 96, 381, 2),
+           rect("dc9565", 9, 105, 24, 3)]
+    for y in (86, 73, 56, 43):
+        art += [rect("deead8", 12, y-1, 375, 13),
+                rect("b4c8b8", 12, y-2, 375, 1)]
+    art += ["BT /Head 8 Tf 0.16 0.28 0.29 rg 38 100 Td (BATTLE / COMMAND) Tj ET",
+            "BT /Mono 10 Tf 0.16 0.28 0.29 rg 14 12 Td (A  CONFIRM) Tj ET"]
+    return art
+
+
+def selection_art():
+    # A cursor arrow and a top border that mark the row without covering text.
+    return [rect("d98156", 0, 2, 12, 11),
+            polygon("d98156", [(0, 13), (3, 2), (9, 2), (15, 7), (9, 12), (3, 12)]),
+            polygon("fff4da", [(4, 10), (6, 5), (9, 5), (12, 7), (9, 9), (6, 9)])]
 
 
 def combat_sprite(kind, facing_left=False):

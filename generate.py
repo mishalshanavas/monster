@@ -8,8 +8,8 @@ from pypdf.generic import (
     NumberObject, TextStringObject,
 )
 from artwork import (
-    MONSTERS, NPC_COLORS, TILE_NAMES, actor_art, arena_art, combat_sprite, health_art,
-    impact_art, portrait_art, tile_art, trail_art,
+    MONSTERS, NPC_COLORS, TILE_NAMES, actor_art, arena_art, battle_panel_art,
+    combat_sprite, health_art, impact_art, portrait_art, selection_art, tile_art, trail_art,
 )
 from reportlab.lib.colors import HexColor
 from reportlab.pdfgen.canvas import Canvas
@@ -69,42 +69,67 @@ def background():
         c.setStrokeColor(HexColor(color))
         c.setStrokeAlpha(alpha)
 
-    ink = "#1d3d35"
-    fill("#202e36")
-    c.roundRect(0, 0, WIDTH, HEIGHT, 24, fill=1, stroke=0)
-    fill("#4a5d62")
-    c.roundRect(4, 4, WIDTH - 8, HEIGHT - 8, 20, fill=1, stroke=0)
-    fill("#c8dca1")
-    c.roundRect(7, 7, WIDTH - 14, HEIGHT - 14, 17, fill=1, stroke=0)
+    ink = "#dce5d4"
+    fill("#152931")
+    c.roundRect(0, 0, WIDTH, HEIGHT, 30, fill=1, stroke=0)
+    fill("#334c52")
+    c.roundRect(4, 4, WIDTH - 8, HEIGHT - 8, 27, fill=1, stroke=0)
+    fill("#1b333a")
+    c.roundRect(9, 9, WIDTH - 18, HEIGHT - 18, 24, fill=1, stroke=0)
+    fill("#536a6b")
+    c.roundRect(142, 84, 476, 329, 16, fill=1, stroke=0)
+    fill("#101e25")
+    c.roundRect(147, 90, 466, 318, 10, fill=1, stroke=0)
+    fill("#e9edd5")
+    c.roundRect(152, 95, 456, 308, 5, fill=1, stroke=0)
+    fill("#f6e5b3")
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(24, 386, "MONSTER")
+    c.setFont("Helvetica", 6)
+    c.drawString(24, 376, "SUMMIT CIRCUIT")
+    fill("#d58658")
+    c.circle(80, 335, 4, fill=1, stroke=0)
+    fill("#91b7aa")
+    c.setFont("Helvetica-Bold", 6)
+    c.drawCentredString(80, 319, "POWER")
+    for x in (337, 345, 353, 407, 415, 423):
+        fill("#536a6b")
+        c.roundRect(x, 77, 4, 9, 2, fill=1, stroke=0)
 
-    # Controls sit on the same surface as the game, inside the thin bezel.
+    # The controls remain large hit targets, but read as physical hardware.
     pad_x, pad_y = 80, 91.5
-    fill(ink, .10)
-    stroke(ink, .22)
+    fill("#0d222a")
+    stroke("#77908a")
     c.setLineWidth(1)
     c.circle(pad_x, pad_y, 72, fill=1, stroke=1)
-    fill(ink, .18)
-    c.circle(pad_x, pad_y, 19, fill=1, stroke=1)
+    fill("#3f5c60")
+    c.circle(pad_x, pad_y, 64, fill=1, stroke=0)
+    fill("#18333c")
+    c.roundRect(pad_x - 21, pad_y - 55, 42, 110, 8, fill=1, stroke=0)
+    c.roundRect(pad_x - 55, pad_y - 21, 110, 42, 8, fill=1, stroke=0)
+    fill("#304e54")
+    c.circle(pad_x, pad_y, 17, fill=1, stroke=0)
 
     for action, (x, y, w, h) in CONTROLS.items():
         cx, cy = x + w / 2, y + h / 2
         if action == "menu":
-            fill(ink, .19)
-            c.roundRect(cx - 25, cy - 5, 50, 10, 5, fill=1, stroke=0)
+            fill("#0d222a")
+            c.roundRect(cx - 22, cy - 5, 44, 13, 6, fill=1, stroke=0)
             fill(ink)
             c.setFont("Helvetica-Bold", 8)
-            c.drawCentredString(cx, cy - 16, "START")
+            c.drawCentredString(cx, cy - 19, "START")
             continue
         if action in ("a", "b"):
-            accent = "#9b3e56" if action == "a" else "#584773"
-            fill(accent, .24)
-            stroke(accent, .68)
-            c.circle(cx, cy, 28 if action == "a" else 25, fill=1, stroke=1)
-            fill(ink)
-            c.setFont("Helvetica-Bold", 22)
+            accent = "#cd704d" if action == "a" else "#648b89"
+            fill("#0d222a")
+            c.circle(cx, cy-3, 31 if action == "a" else 28, fill=1, stroke=0)
+            fill(accent)
+            c.circle(cx, cy, 28 if action == "a" else 25, fill=1, stroke=0)
+            fill("#fff4da")
+            c.setFont("Helvetica-Bold", 21)
             c.drawCentredString(cx, cy - 7, action.upper())
             continue
-        stroke(ink, .83)
+        stroke(ink)
         c.setLineCap(1)
         c.setLineJoin(1)
         c.setLineWidth(2.8)
@@ -196,7 +221,7 @@ def build():
         appearance = DecodedStreamObject()
         appearance.update(dictionary(
             Type=name("XObject"), Subtype=name("Form"), BBox=numbers(0, 0, width, height),
-            Resources=dictionary(),
+            Resources=resources,
         ))
         appearance.set_data("\n".join(commands).encode("ascii"))
         return writer._add_object(appearance.flate_encode())
@@ -214,6 +239,11 @@ def build():
     for arena in ("meadow", "cave", "summit"):
         graphical_field(f"arena_{arena}", 70, 308, 399, 134,
                         art_stream(arena_art(arena), 399, 134))
+    graphical_field("battle_panel", 70, 205, 399, 113,
+                    art_stream(battle_panel_art() + [
+                        "BT /Head 8 Tf 0.16 0.28 0.29 rg 38 100 Td (BATTLE / COMMAND) Tj ET",
+                        "BT /Mono 10 Tf 0.16 0.28 0.29 rg 14 12 Td (A  CONFIRM) Tj ET",
+                    ], 399, 113))
     positions = {"foe": (335, 367, -1), "ally": (100, 313, 1)}
     for kind in MONSTERS:
         graphical_field(f"portrait_profile_{kind}", 310, 316, 160, 108,
@@ -242,8 +272,14 @@ def build():
         top = 447 - row * 13
         if row == 0 or row >= 14:
             top -= 4
-        widget(f"row{row}", (68, top, 405, 21 if row == 0 else 13), value)
-    widget("status", (68, 199, 405, 15))
+        widget(f"row{row}", (82 if 12 <= row <= 15 else 76, top,
+                            389 if 12 <= row <= 15 else 397,
+                            21 if row == 0 else 13), value)
+    # Selection bands are added after the text so they highlight above it.
+    for slot, y in ((12, 291), (13, 278), (14, 261), (15, 248)):
+        graphical_field(f"battle_selection_{slot}", 82, y, 375, 13,
+                        art_stream(selection_art(), 375, 13))
+    widget("status", (76, 199, 397, 15))
     for action, rect in reversed(CONTROLS.items()):
         widget("button_" + action, rect, action=action)
 

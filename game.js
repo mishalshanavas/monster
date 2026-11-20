@@ -144,6 +144,13 @@ var MonsterGame = (function (doc) {
         else if (state === "PARTY") wanted["portrait_profile_" + party[selected].kind.name] = true;
         else if (state === "BATTLE") {
             wanted["arena_" + battle.arena] = true;
+            wanted["battle_panel"] = true;
+            if (!animation && battle.mode !== "message") {
+                var menuRow = battle.mode === "root" ? 12 + selected :
+                    battle.mode === "switch" || battle.mode === "forced" ? 12 + selected :
+                    13 + selected;
+                if (menuRow <= 15) wanted["battle_selection_" + menuRow] = true;
+            }
             var hit = animation && animation.hits[Math.floor(animation.frame / 4)];
             var frame = animation ? animation.frame % 4 : -1;
             ["foe", "ally"].forEach(function (side) {

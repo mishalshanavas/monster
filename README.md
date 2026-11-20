@@ -22,11 +22,17 @@ The generator writes `monster.pdf` beside its sources and checks the page count,
 
 The tile graphics, people, monster portraits, and HP bars are original pixel art defined in `artwork.py`. The PDF stores them as shared widget appearances. The game updates only the tiles, sprites, and text that changed.
 
+## Shell and battle UI
+
+The page is drawn as a handheld console: a dark rounded shell with screen labels and speaker holes, a mint game screen, and physical-looking controls — a D-pad, a pill-shaped **START** key, and coral/teal **A**/**B** discs. The button hit areas cover the whole control, not just the label.
+
+In battle the screen shows the region arena behind the two monsters. A cream command panel runs along the bottom of the screen with a "BATTLE / COMMAND" header, a menu strip per action, and an orange cursor arrow that marks the selected row without covering its label. HP bars and the panel are pixel art drawn in `artwork.py`; the menu text sits above the panel's row strips.
+
 ## Browser verification
 
 Tested in the built-in PDF viewer of Chromium 141.0.7390.37, opening the PDF from disk with HTTP and HTTPS requests blocked. The page count is checked on every build.
 
-The Chromium playthrough covered starter selection, village healing, camera scrolling, a wild capture, party inspection, both trainer wins, and a return to exploration after victory. A separate JavaScript run exercised all three starters, capture failure, a forced party replacement, and a restart after defeat.
+The Chromium playthrough covered starter selection, village healing, camera scrolling, a wild capture, party inspection, both trainer wins, and a return to exploration after victory. A separate JavaScript run exercised all three starters, capture failure, a forced party replacement, and a restart after defeat. The redesigned shell and battle panel were re-verified with a full control pass, menu selection, and a battle turn at 844×390 and 1150×700 landscape fit sizes.
 
 ## Missions
 
