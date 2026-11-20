@@ -30,11 +30,14 @@ CONTROLS = {
 
 
 def display_rect(x, y, width, height):
+    left = WIDTH / 2 + (x - 270) * DISPLAY_SCALE
+    bottom = HEIGHT - 16 + (y - 468) * DISPLAY_SCALE
+    # Neighboring tiles must share the same rounded edge.
+    x0, y0 = round(left), round(bottom)
     return (
-        round(WIDTH / 2 + (x - 270) * DISPLAY_SCALE),
-        round(HEIGHT - 16 + (y - 468) * DISPLAY_SCALE),
-        round(width * DISPLAY_SCALE),
-        round(height * DISPLAY_SCALE),
+        x0, y0,
+        round(left + width * DISPLAY_SCALE) - x0,
+        round(bottom + height * DISPLAY_SCALE) - y0,
     )
 
 
